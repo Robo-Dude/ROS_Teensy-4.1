@@ -142,6 +142,87 @@ Teensy 4.1 Setup in Linux System Jetson Nano using TeensyDuino and Arduino IDE.
 https://user-images.githubusercontent.com/65345575/183492639-801f63d4-252a-491b-afd7-90fa21022afa.mp4
 
 
+### Testing of Teensy 4.1 With ROS Program On Jetson Nano.
+
+#### Create a ROS Program To Control A Servo Motor Using Teensy 4.1 
+
+In this test , We connect a Servo Motor to the Teensy 4.1 and try to control Servo Motion Using ROS Program. 
+
+So , Let’s Start and Follow the Given Instructions.
+
+#### INSTRUCTIONS
+
+1. Establishing the connection between the PC and the Teensy 4.1 using the Micro USB
+   
+   Simply Connect the micro USB side to the Teensy 4.1 microcontroller and plug in USB to your system , you can also use your mobile charger to establish    the connection. 
+   
+   ![image](https://user-images.githubusercontent.com/65345575/183494349-534ee5c1-c8f1-44c9-ab93-9306cf4025e4.png)
+   
+2.  Circuit Connection of Servo Motor to Teensy 4.1 
+
+     Just Connect the Vcc Pin of the servo to the teensy 4.1 5V and GND to Ground of the Teensy 4.1 and Input pin of the servo to the D9 of the teensy        4.1..
+
+3. Uploading of the ROS Serial Program in Teensy 4.1 to control the Servo Motors
+ 
+   The code for this tutorial is made extremely simple through the use of the Arduino Servo library. The Servo Library handles all of the low level          control to generate and maintain the servo pulses. All your code needs to do is specify the pin the servo is attached to and then write the angle to      the servo object. Underneath, the Servo library uses the Arduino's built in timer interrupts to generate the correct pulses. In this example, we only    control one servo, but the same library can be used to control up to 12 servos on most Arduino boards and 48 on the Arduino Mega. 
+   
+### Arduino Code 
+
+      #include <WProgram.h>
+      #include <Servo.h> 
+      #include <ros.h>
+      #include <std_msgs/UInt16.h>
+
+      ros::NodeHandle  nh;
+
+      Servo servo;
+
+      void servo_cb( const std_msgs::UInt16& cmd_msg){
+        servo.write(cmd_msg.data); //set servo angle, should be from 0-180  
+        digitalWrite(13, HIGH-digitalRead(13));  //toggle led  
+      }
+
+
+      ros::Subscriber<std_msgs::UInt16> sub("servo", servo_cb);
+
+      void setup(){
+         pinMode(13, OUTPUT);
+
+         nh.initNode();
+         nh.subscribe(sub);
+  
+         servo.attach(9); //attach it to pin 9
+      }
+
+      void loop(){
+         nh.spinOnce();
+         delay(1);
+      }
+      
+4. Use the [Rosserial Package](http://wiki.ros.org/rosserial) and open the three terminals
+
+   Terminal 1
+      
+        roscore
+        
+    Terminal 2
+    
+        rosrun rossserial_arduino serial.py _port="port_number_of_the_teensy_4.1"
+        
+    Terminal 3 (publish the message on this terminal)
+    
+        rostopic pub servo std_msgs/UInt16  <angle>
+        
+## Completed
+
+Video Link - [ROS Servo Teensy 4.1](https://drive.google.com/file/d/1BRunQmjcDJzLv_bsxRNxVLPvhmCrDqyo/view)
+      
+      
+
+
+
+
+   
 
 
 
